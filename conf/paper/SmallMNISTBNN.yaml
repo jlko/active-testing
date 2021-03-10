@@ -1,0 +1,71 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/SmallMNISTBNN
+
+hoover:
+  save_data: False
+
+experiment:
+  n_runs: 1000
+  loss: CrossEntropyLoss
+  save_every: 5
+  log_every: 1
+  abort_test_after: 1000
+
+dataset:
+  n_points: 5250  # 5000 test, 250 train
+  test_proportion: 0.9523809524
+  name: MNISTDataset
+  standardize: True
+  stratify: True
+
+acquisition:
+  lazy_save_schedule: [0, 100, 300, 500, 700]
+  uniform_clip: False
+
+model:
+  # name: TinyRadialBNN
+  name: RadialBNN
+  channels: 16
+  skip_fit_debug: False
+  data_CHW: [1, 28, 28]
+  lazy: True  # affects acquisition
+  efficient: True  # affects main model
+  training_cfg:
+    validation_set_size: 50
+    # stratify_val: False
+    stratify_val: True
+    max_epochs: 500
+    learning_rate: 1e-4
+    batch_size: 64
+    variational_samples: 8
+    num_workers: 4
+    pin_memory: True
+    early_stopping_epochs: 5
+    padding_epochs: none
+    num_repetitions: 1
+    weight_decay: 1e-4
+    model: radial_bnn
+    channels: 16
+    checkpoints_frequency: 3
+    data_noise_proportion: None
+  testing_cfg:
+    variational_samples: 100
+
+acquisition_functions:
+    - TrueLossAcquisition:
+    - RandomAcquisition:
+    - ClassifierAcquisitionEntropy:
+    - RandomForestClassifierSurrogateAcquisitionEntropy: RFInfDepth
+    - SelfSurrogateAcquisitionEntropy:
+
+acquisition_configs:
+  RFInfDepth:
+    lazy: True
+    efficient: True
+    sk_args:
+      n_estimators: 100
+      criterion: entropy
+      max_features: sqrt
+      n_jobs: -1

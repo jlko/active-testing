@@ -1,0 +1,124 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/LargeCIFAR100ResNet
+
+hoover:
+  save_data: False
+
+experiment:
+  n_runs: 1000
+  loss: CrossEntropyLoss
+  save_every: 10
+  log_every: 1
+  abort_test_after: 1000
+
+dataset:
+  n_points: 60000
+  test_proportion: 0.0166666666
+  name: Cifar100Dataset
+  standardize: True  # we use torchvision transforms for cifar10
+  # standardize: False  # we use torchvision transforms for cifar10
+  respect_train_test: True  # (subsample from original test set)
+
+acquisition:
+  lazy_save_schedule: [0, 100, 300, 500, 700]
+  uniform_clip: False
+
+model:
+  keep_constant: True   # no retrain in main, also disable fit method after single use!
+  name: ResNet18
+  # name: WideResNet
+  efficient: True
+  skip_fit_debug: False
+  data_CHW: [3, 32, 32]
+  num_classes: 100
+  debug_mnist: False
+  training_cfg:
+    validation_set_size: 2000  # probably often change this
+    stratify_val: True
+    # max_epochs: 160            # set
+    max_epochs: 30
+    learning_rate: 0.1        # set
+    batch_size: 128
+    num_workers: 4
+    pin_memory: True
+    early_stopping_epochs: 5
+    weight_decay: 5e-4
+    optimizer: cifar
+    scheduler: cosine
+    # scheduler: cifar
+    transforms: cifar
+    testing_cfg:
+      batch_size: 1000
+
+acquisition_functions:
+    - TrueLossAcquisition:
+    - RandomAcquisition:
+    - ClassifierAcquisitionEntropy:
+    # - SelfSurrogateAcquisitionEntropy: LazySurr
+    - AnySurrogateAcquisitionEntropy: LazySurrEnsemble
+
+acquisition_configs:
+  LazySurr:
+    keep_constant: True
+    name: ResNet18
+    # name: WideResNet
+    efficient: True
+    save_path: single_aux/model.pth
+    skip_fit_debug: single_aux/model.pth  # load instead of retraining
+    skip_fit_debug_relative: True
+    data_CHW: [3, 32, 32]
+    num_classes: 100
+    debug_mnist: False
+    lazy: True
+    lazy_schedule: []  # never retrain
+    training_cfg:
+      validation_set_size: 2000  # probably often change this
+      stratify_val: True
+      # max_epochs: 160            # set
+      max_epochs: 30
+      learning_rate: 0.1        # set
+      batch_size: 128
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 5
+      weight_decay: 5e-4
+      optimizer: cifar
+      scheduler: cosine
+      # scheduler: cifar
+      transforms: cifar
+    testing_cfg:
+      batch_size: 1000
+  LazySurrEnsemble:
+    keep_constant: True
+    name: ResNet18Ensemble
+    # name: WideResNet
+    n_models: 15
+    # name: WideResNet
+    efficient: True
+    save_path: ensembles/model_{}.pth
+    skip_fit_debug: ensembles/model_{}.pth  # load instead of retraining
+    skip_fit_debug_relative: True
+    data_CHW: [3, 32, 32]
+    num_classes: 100
+    debug_mnist: False
+    lazy: True
+    lazy_schedule: []
+    training_cfg:
+      validation_set_size: 2000  # probably often change this
+      stratify_val: True
+      # max_epochs: 160            # set
+      max_epochs: 30
+      learning_rate: 0.1        # set
+      batch_size: 128
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 5
+      weight_decay: 5e-4
+      optimizer: cifar
+      scheduler: cosine
+      # scheduler: cifar
+      transforms: cifar
+    testing_cfg:
+      batch_size: 1000

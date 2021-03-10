@@ -1,0 +1,16 @@
+# conda create -n isactive python=3.8
+# conda activate isactive
+# pip install -r requirements.txt
+torch==1.7.0
+tensorflow
+numpy
+hydra-core
+omegaconf
+scikit-learn
+pandas
+torchvision
+jupyterlab
+notebook
+matplotlib
+seaborn
+celluloid

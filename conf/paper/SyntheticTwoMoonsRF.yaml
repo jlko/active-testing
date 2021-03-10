@@ -1,0 +1,29 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/SyntheticTwoMoonsRF
+
+experiment:
+  n_runs: 2500
+  loss: CrossEntropyLoss
+  random_seed: 0
+
+dataset:
+  test_proportion: 0.1
+  n_points: 500
+  name: TwoMoonsDataset
+  standardize: False
+  noise: 0.01
+  log_every: 50
+
+model:
+  name: RandomForestClassifier
+
+acquisition_functions:
+    - TrueLossAcquisition:
+    - RandomAcquisition:
+    # - ClassifierAcquisitionEntropy:
+    - RandomForestClassifierSurrogateAcquisitionEntropy:  
+
+acquisition:
+  uniform_clip: False

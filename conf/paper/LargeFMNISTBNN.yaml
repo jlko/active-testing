@@ -1,0 +1,85 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/LargeFMNISTBNN
+
+hoover:
+  save_data: False
+
+experiment:
+  n_runs: 1000
+  loss: CrossEntropyLoss
+  save_every: 5
+  log_every: 1
+  abort_test_after: 1000
+
+dataset:
+  n_points: 60000
+  test_proportion: 0.16666666666
+  name: FashionMNISTDataset
+  standardize: True
+  stratify: True
+
+acquisition:
+  lazy_save_schedule: [0, 100, 300, 500, 700]
+  uniform_clip: False
+
+model:
+  name: RadialBNN
+  channels: 16
+  skip_fit_debug: False
+  data_CHW: [1, 28, 28]
+  efficient: True  # affects main model
+  training_cfg:
+    validation_set_size: 1280  # probably often change this
+    max_epochs: 50
+    learning_rate: 1e-4
+    batch_size: 64
+    variational_samples: 8
+    num_workers: 4
+    pin_memory: True
+    early_stopping_epochs: 5
+    padding_epochs: none
+    num_repetitions: 1
+    weight_decay: 1e-4
+    model: radial_bnn
+    channels: 16
+    checkpoints_frequency: 3
+    data_noise_proportion: None
+  testing_cfg:
+    variational_samples: 100
+
+acquisition_functions:
+    - TrueLossAcquisition:
+    - RandomAcquisition:
+    - ClassifierAcquisitionEntropy:
+    - BNNClassifierAcquisitionMI:
+    # - SelfSurrogateAcquisitionEntropy: LazySurr
+
+acquisition_configs:
+  LazySurr:
+    name: RadialBNN
+    channels: 16
+    skip_fit_debug: False
+    data_CHW: [1, 28, 28]
+    efficient: True  # affects main model
+    lazy: True
+    lazy_schedule: []
+    training_cfg:
+      validation_set_size: 1280  # probably often change this
+      max_epochs: 50
+      learning_rate: 1e-4
+      batch_size: 64
+      variational_samples: 8
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 5
+      padding_epochs: none
+      num_repetitions: 1
+      weight_decay: 1e-4
+      model: radial_bnn
+      channels: 16
+      checkpoints_frequency: 3
+      data_noise_proportion: None
+    testing_cfg:
+      variational_samples: 100

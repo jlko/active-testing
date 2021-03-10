@@ -1,0 +1,39 @@
+defaults:
+  - hydra: default
+
+hoover:
+  save_data: True
+
+dataset:
+  test_proportion: 0.5
+  n_points: 100
+  standardize: False
+
+experiment: 
+  n_runs: 5000
+  random_seed: -1
+  debug: False
+  save_data_until: 10
+  loss: SELoss
+  log_every: 100
+  save_every: 1000
+
+risk_estimators:
+    - TrueRiskEstimator
+    - BiasedRiskEstimator
+    - FancyUnbiasedRiskEstimator
+    # - NaiveUnbiasedRiskEstimator
+    # - ImportanceWeightedRiskEstimator
+
+acquisition_functions:
+  - TrueLossAcquisition:
+  - RandomAcquisition:
+  - DistanceBasedAcquisition:
+
+acquisition:
+  sample: True
+  animate: True
+  animate_until: 10
+  lazy_save: True
+  uniform_clip: True
+  uniform_clip_val: 0.5

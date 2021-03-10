@@ -1,0 +1,28 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/SyntheticGPGP
+
+experiment:
+  n_runs: 5000
+
+dataset:
+  test_proportion: 0.9
+  n_points: 50
+  name: GPDatasetForGPReg
+  standardize: False
+
+model:
+  name: GaussianProcessRegressor
+  task: regression
+  efficient: True
+
+acquisition_functions: 
+  - TrueLossAcquisition:
+  - RandomAcquisition:
+  - DistanceBasedAcquisition:
+  - GPSurrogateAcquisitionMSE:
+  - GPAcquisitionUncertainty:
+
+acquisition:
+  uniform_clip: False

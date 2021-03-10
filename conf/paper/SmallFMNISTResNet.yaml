@@ -1,0 +1,164 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/SmallFMNISTResNet
+
+hoover:
+  save_data: False
+
+experiment:
+  n_runs: 1000
+  loss: CrossEntropyLoss
+  save_every: 1
+  log_every: 1
+  abort_test_after: 1000
+
+dataset:
+  n_points: 5250  # 5000 test, 250 train
+  test_proportion: 0.9523809524
+  name: FashionMNISTDataset
+  standardize: True
+  stratify: True
+
+acquisition:
+  lazy_save_schedule: [0, 100, 300, 500, 700]
+  uniform_clip: False
+
+model:
+  name: ResNet18
+  # name: WideResNet
+  efficient: True
+  lazy: True
+  skip_fit_debug: False
+  data_CHW: [1, 28, 28]
+  num_classes: 10
+  debug_mnist: True
+  training_cfg:
+    validation_set_size: 50  # probably often change this
+    stratify_val: True
+    max_epochs: 160            # set
+    # max_epochs: 5
+    learning_rate: 0.1        # set
+    batch_size: 128
+    num_workers: 4
+    pin_memory: True
+    early_stopping_epochs: 20
+    weight_decay: 5e-4
+    optimizer: cifar
+    scheduler: cosine
+    # scheduler: cifar
+    # transforms: cifar
+  testing_cfg:
+    batch_size: 1000
+
+acquisition_functions:
+    - TrueLossAcquisition:
+    - RandomAcquisition:
+    - ClassifierAcquisitionEntropy:
+    - RandomForestClassifierSurrogateAcquisitionEntropy: RFInfDepth
+    - SelfSurrogateAcquisitionEntropy:
+    - SelfSurrogateAcquisitionEntropy: LazySurr
+    - AnySurrogateAcquisitionEntropy: LazySurrEnsemble
+    - RandomForestClassifierSurrogateAcquisitionEntropy: RFInfDepthTrain  # retrain on train only
+    - SelfSurrogateAcquisitionEntropy: LazyTrain # retrain on train only
+
+acquisition_configs:
+  RFInfDepth:
+    lazy: True
+    efficient: True
+    sk_args:
+      n_estimators: 100
+      criterion: entropy
+      max_features: sqrt
+      n_jobs: -1
+  LazySurr:
+    name: ResNet18
+    # name: WideResNet
+    efficient: True
+    lazy: True
+    lazy_schedule: [0]
+    skip_fit_debug: False
+    data_CHW: [1, 28, 28]
+    num_classes: 10
+    debug_mnist: True
+    training_cfg:
+      validation_set_size: 50  # probably often change this
+      stratify_val: True
+      max_epochs: 160            # set
+      # max_epochs: 5
+      learning_rate: 0.1        # set
+      batch_size: 128
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 20
+      weight_decay: 5e-4
+      optimizer: cifar
+      scheduler: cosine
+      # scheduler: cifar
+      # transforms: cifar
+    testing_cfg:
+      batch_size: 1000
+  LazySurrEnsemble:
+    name: ResNet18Ensemble
+    # name: WideResNet
+    efficient: True
+    n_models: 5
+    lazy: True
+    lazy_schedule: [0]
+    skip_fit_debug: False
+    data_CHW: [1, 28, 28]
+    num_classes: 10
+    debug_mnist: True
+    training_cfg:
+      validation_set_size: 50  # probably often change this
+      stratify_val: True
+      max_epochs: 160            # set
+      # max_epochs: 5
+      learning_rate: 0.1        # set
+      batch_size: 128
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 20
+      weight_decay: 5e-4
+      optimizer: cifar
+      scheduler: cosine
+      # scheduler: cifar
+      # transforms: cifar
+    testing_cfg:
+      batch_size: 1000
+  RFInfDepthTrain:
+    lazy: True
+    efficient: True
+    on_train_only: True   # only supported for lazy
+    sk_args:
+      n_estimators: 100
+      criterion: entropy
+      max_features: sqrt
+      n_jobs: -1
+  LazyTrain:
+    name: ResNet18
+    # name: WideResNet
+    efficient: True
+    lazy: True
+    on_train_only: True
+    skip_fit_debug: False
+    data_CHW: [1, 28, 28]
+    num_classes: 10
+    debug_mnist: True
+    training_cfg:
+      validation_set_size: 50  # probably often change this
+      stratify_val: True
+      max_epochs: 160            # set
+      # max_epochs: 5
+      learning_rate: 0.1        # set
+      batch_size: 128
+      num_workers: 4
+      pin_memory: True
+      early_stopping_epochs: 20
+      weight_decay: 5e-4
+      optimizer: cifar
+      scheduler: cosine
+      # scheduler: cifar
+      # transforms: cifar
+    testing_cfg:
+      batch_size: 1000

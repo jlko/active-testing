@@ -1,0 +1,27 @@
+# @package _global_
+hydra:
+  run:
+    dir: ./outputs/final/SyntheticQuadraticLinear
+
+experiment:
+  n_runs: 5000
+
+dataset:
+  test_proportion: 0.9
+  n_points: 50
+  name: QuadraticDatasetForLinReg
+  standardize: False
+
+model:
+  name: LinearRegressionModel
+  task: regression
+  efficient: True
+
+acquisition_functions: 
+  - TrueLossAcquisition:
+  - RandomAcquisition:
+  - DistanceBasedAcquisition:
+  - GPSurrogateAcquisitionMSE:
+
+acquisition:
+  uniform_clip: False

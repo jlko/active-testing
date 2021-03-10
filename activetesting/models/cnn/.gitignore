@@ -1,0 +1,12 @@
+__pycache__
+.vscode
+*.pt
+*.err
+*.out
+.nfs*
+*.png
+plots
+runs
+data
+notification.sh
+
